@@ -98,10 +98,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const card = document.createElement('article');
                 card.className = 'card';
                 card.id = `item-${i + index}`;
-                const proxiedImg = getProxiedUrl(item.image);
                 card.innerHTML = `
                     <div class="card-img-wrap">
-                        <img src="${proxiedImg}" alt="${item.title}" loading="lazy" crossorigin="anonymous" onclick="openImageModal('${proxiedImg}')" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png';">
+                        <img src="${item.image}" alt="${item.title}" loading="lazy" onclick="openImageModal('${item.image}')" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png';">
                     </div>
                 `;
                 innerGrid.appendChild(card);
@@ -136,10 +135,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const mm = item.date.substring(5, 7);
                 const dd = item.date.substring(8, 10);
                 const shortDate = `${yy}/${mm}/${dd}`;
-                const proxiedImg = getProxiedUrl(item.image);
                 trs += `
                     <tr>
-                        <td style="width: 45px;"><img src="${proxiedImg}" class="table-img" crossorigin="anonymous" onclick="openImageModal('${proxiedImg}')" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png';"></td>
+                        <td style="width: 45px;"><img src="${item.image}" class="table-img" onclick="openImageModal('${item.image}')" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png';"></td>
                         <td style="font-weight: 600;">${item.title}</td>
                         <td>${shortDate}</td>
                         <td>${item.place || '-'}</td>
