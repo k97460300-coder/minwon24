@@ -442,6 +442,13 @@ header {
     stroke: var(--accent);
 }
 
+/* Explicit sizing for table columns */
+.excel-table th:nth-child(1),
+.excel-table td:nth-child(1) {
+    width: 60px;
+    min-width: 60px;
+}
+
 /* Footer */
 footer {
     padding: 6rem 2rem;

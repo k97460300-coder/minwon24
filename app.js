@@ -91,15 +91,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         items.forEach((item, index) => {
+            // Format date from YYYY-MM-DD to YY/MM/DD
+            const yy = item.date.substring(2, 4);
+            const mm = item.date.substring(5, 7);
+            const dd = item.date.substring(8, 10);
+            const shortDate = `${yy}/${mm}/${dd}`;
+            
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td>${index + 1}</td>
                 <td><img src="${item.image}" class="table-img" onclick="openImageModal('${item.image}')" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png';"></td>
                 <td style="font-weight: 600;">${item.title}</td>
-                <td>${item.date}</td>
+                <td>${shortDate}</td>
                 <td>${item.place || '-'}</td>
-                <td>${item.storage || '-'}</td>
-                <td><span style="color: var(--accent); font-weight: 500;">保管中</span></td>
             `;
             tableBody.appendChild(tr);
         });
@@ -137,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btnExport.addEventListener('click', () => {
         if (allItems.length === 0) return alert('没有可导出的数据。');
         
-        const headers = ['序号', '物品名称', '拾获日期', '拾获地点', '保管地点', '类别'];
+        const headers = ['序号', '物品名称', '拾获日期', '拾获地点', '类别'];
         const rows = allItems.map((item, idx) => [
             idx + 1,
             `"${item.title.replace(/"/g, '""')}"`,
