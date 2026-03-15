@@ -29,9 +29,6 @@ async function crawlLostItems() {
         "Referer": "https://minwon24.police.go.kr/cvlcpt/cvlcptAply.do?cvlcptId=MW-201&keyword="
     };
 
-    const pageCount = 20; // 한 번에 가져올 개수
-    let allItems = [];
-
     const translateMap = {
         // Categories
         "지갑": "钱包", "현금": "现金", "카드": "卡片", "휴대폰": "手机", "신분증": "身份证件",
@@ -46,7 +43,7 @@ async function crawlLostItems() {
         "노란색": "黄色", "초록색": "绿色", "보라색": "紫色", "가죽": "皮革", "아이폰": "iPhone",
         "갤럭시": "Galaxy", "지갑": "钱包", "가방": "包", "열쇠": "钥匙", "안경": "眼镜",
         "장갑": "手套", "우산": "雨伞", "신발": "鞋", "카드": "卡", "만원": "1万韩元",
-        "오만원": "5万韩元", "천원": "1千韩元", "오천원": "5千韩元", "동전": "硬币",
+        "오만원": "5万韩元", "천원": "1千韩원", "오천원": "5천韩원", "동전": "硬币",
         "습득": "拾获", "보관": "保管", "분실": "丢失", "발견": "发现"
     };
 
@@ -60,67 +57,85 @@ async function crawlLostItems() {
         return translated;
     };
 
+    let allItems = [];
+    let pageStart = 1;
+    const pageCount = 1000;
+    let totalCount = 0;
+
     try {
-        // API 요청 페이로드 (동일)
-        const payload = {
-            "query": "",
-            "searchFields": ["_ALL_"],
-            "resultFields": ["_ALL_"],
-            "collections": ["FOUND"],
-            "pageStart": 1,
-            "pageCount": pageCount.toString(),
-            "orderBys": ["DATE/DESC"],
-            "subQueries": {
-                "MODE": "DETAIL",
-                "SNIPPET_SIZE": "200",
-                "HL_TERM": "",
-                "FOUND_FILTER_QUERY": "<PKUP_RGN_SE_CD:match:LCP000>",
-                "FOUND_COLLECTION_QUERY": "",
-                "START_DATE": startDate,
-                "END_DATE": endDate
+        while (true) {
+            console.log(`[CRAWL] Fetching page starting at ${pageStart}...`);
+            const payload = {
+                "query": "",
+                "searchFields": ["_ALL_"],
+                "resultFields": ["_ALL_"],
+                "collections": ["FOUND"],
+                "pageStart": pageStart,
+                "pageCount": pageCount.toString(),
+                "orderBys": ["DATE/DESC"],
+                "subQueries": {
+                    "MODE": "DETAIL",
+                    "SNIPPET_SIZE": "200",
+                    "HL_TERM": "",
+                    "FOUND_FILTER_QUERY": "<PKUP_RGN_SE_CD:match:LCP000>",
+                    "FOUND_COLLECTION_QUERY": "",
+                    "START_DATE": startDate,
+                    "END_DATE": endDate
+                }
+            };
+
+            const response = await axios.post(apiUrl, payload, { headers, timeout: 20000 });
+            const result = response.data;
+
+            if (result && result.result && result.result.outputs && result.result.outputs.FOUND) {
+                const foundOutput = result.result.outputs.FOUND;
+                totalCount = parseInt(foundOutput.totalCount || "0");
+                const documents = foundOutput.documents || [];
+                
+                console.log(`[CRAWL] Received ${documents.length} documents for page starting at ${pageStart}`);
+
+                if (pageStart === 1) {
+                    console.log(`[CRAWL] Total items reported by API: ${totalCount}`);
+                }
+
+                documents.forEach(doc => {
+                    const fields = doc.fields || {};
+                    const item = {
+                        id: fields.PKUP_CMDTY_MNG_ID,
+                        title: fields.ITEM_CN, // 품명은 한글로 유지
+                        date: fields.LOST_CMDTY_PKUP_YMD,
+                        category: translate(fields.PRDLST_NM || "기타"),
+                        place: fields.PKUP_PLC_SE_NM,
+                        storage: fields.KPNG_PLC_NM,
+                        owner: fields.TEL || "-",
+                        image: `https://minwon24.police.go.kr/lost112Minwon/selectLostInfoAttachFile.do?pkupCmdtyMngId=${fields.PKUP_CMDTY_MNG_ID}&fileId=${fields.STRG_FILE_PATH}`
+                    };
+
+                    // 제목 정제 (숫자 접두사 제거)
+                    if (item.title) {
+                        item.title = item.title.replace(/^\d+\.?\s*/, '');
+                    }
+
+                    if (item.id && item.title) {
+                        allItems.push(item);
+                    }
+                });
+
+                pageStart += pageCount;
+                if (pageStart > totalCount || documents.length === 0) {
+                    break;
+                }
+            } else {
+                break;
             }
-        };
-
-        const response = await axios.post(apiUrl, payload, { headers, timeout: 20000 });
-        const result = response.data;
-
-        if (result && result.result && result.result.outputs && result.result.outputs.FOUND) {
-            const documents = result.result.outputs.FOUND.documents || [];
-            console.log(`[CRAWL] Found ${documents.length} items from API.`);
-
-            documents.forEach(doc => {
-                const fields = doc.fields || {};
-                const item = {
-                    id: fields.PKUP_CMDTY_MNG_ID,
-                    title: fields.ITEM_CN, // 품명은 한글로 유지
-                    date: fields.LOST_CMDTY_PKUP_YMD,
-                    category: translate(fields.PRDLST_NM || "기타"),
-                    place: fields.PKUP_PLC_SE_NM,
-                    storage: fields.KPNG_PLC_NM,
-                    owner: fields.TEL || "-",
-                    image: `https://minwon24.police.go.kr/lost112Minwon/selectLostInfoAttachFile.do?pkupCmdtyMngId=${fields.PKUP_CMDTY_MNG_ID}&fileId=${fields.STRG_FILE_PATH}`
-                };
-
-                // 제목 정제 (숫자 접두사 제거)
-                if (item.title) {
-                    item.title = item.title.replace(/^\d+\.?\s*/, '');
-                }
-
-                if (item.id && item.title) {
-                    allItems.push(item);
-                }
-            });
         }
-
     } catch (error) {
         console.error(`[ERROR] API Request failed: ${error.message}`);
     }
 
-    // 중복 제거
     let uniqueItems = Array.from(new Map(allItems.map(item => [item.id, item])).values());
 
-    // Fallback
-    if (uniqueItems.length === 0) {
+    if (uniqueItems.length === 0 && totalCount === 0) {
         uniqueItems = [
             {
                 id: "SAMPLE_001",
@@ -135,7 +150,6 @@ async function crawlLostItems() {
         ];
     }
 
-    // 파일 저장
     const dataJsPath = path.join(__dirname, '..', 'data.js');
     const dataJsContent = `window.lostItems = ${JSON.stringify(uniqueItems, null, 2)};\nwindow.filterInfo = { region: '济州特别自治道', startDate: '${simpleStartDate}', endDate: '${simpleEndDate}' };`;
     fs.writeFileSync(dataJsPath, dataJsContent, 'utf-8');
@@ -146,7 +160,7 @@ async function crawlLostItems() {
     const csvContent = '\uFEFF' + csvHeaders.join(',') + '\n' + csvRows.join('\n');
     fs.writeFileSync(csvPath, csvContent, 'utf-8');
 
-    console.log(`Successfully saved ${uniqueItems.length} items (Chinese translated).`);
+    console.log(`Successfully saved ${uniqueItems.length} items (Total in API: ${totalCount}).`);
 }
 
 crawlLostItems();
