@@ -262,9 +262,8 @@ async function captureTable() {
         link.click();
     } catch (err) {
         console.error('Table capture failed:', err);
-        } finally {
-            document.body.removeChild(captureWrapper);
-        }
+    } finally {
+        document.body.removeChild(captureWrapper);
     }
 }
 
