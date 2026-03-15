@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // 3열 레이아웃이므로 한 9:16 블록당 12개 할당 (3x4)
         const ITEMS_PER_PAGE_CARD = 12; // 3x4 layout
         for (let i = 0; i < items.length; i += ITEMS_PER_PAGE_CARD) {
-            const pageItems = items.slice(i, i + ITEMS_PER_PER_PAGE_CARD);
+            const pageItems = items.slice(i, i + ITEMS_PER_PAGE_CARD);
             
             // 9:16 래퍼 생성
             const wrapper = document.createElement('div');
