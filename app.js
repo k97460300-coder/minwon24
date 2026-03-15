@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
             card.id = `item-${index}`;
             card.innerHTML = `
                 <div class="card-img-wrap">
-                    <img src="${item.image}" alt="${item.title}" loading="lazy" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png';">
+                    <img src="${item.image}" alt="${item.title}" loading="lazy" onclick="openImageModal('${item.image}')" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png';">
                     <span class="card-date">${item.date}</span>
                 </div>
                 <div class="card-body">
@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td>${index + 1}</td>
-                <td><img src="${item.image}" class="table-img" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png';"></td>
+                <td><img src="${item.image}" class="table-img" onclick="openImageModal('${item.image}')" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png';"></td>
                 <td style="font-weight: 600;">${item.title}</td>
                 <td>${item.date}</td>
                 <td>${item.place || '-'}</td>
@@ -262,7 +262,27 @@ async function captureTable() {
         link.click();
     } catch (err) {
         console.error('Table capture failed:', err);
-    } finally {
-        document.body.removeChild(captureWrapper);
+        } finally {
+            document.body.removeChild(captureWrapper);
+        }
+    }
+}
+
+// 이미지 확대 관련 전역 함수
+function openImageModal(imgSrc) {
+    const modal = document.getElementById('image-modal');
+    const modalImg = document.getElementById('modal-img');
+    if (modal && modalImg) {
+        modalImg.src = imgSrc;
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden'; // 스크롤 방지
+    }
+}
+
+function closeImageModal() {
+    const modal = document.getElementById('image-modal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = ''; // 스크롤 복원
     }
 }
