@@ -18,6 +18,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnExport = document.getElementById('btn-export');
     const btnCrawl = document.getElementById('btn-crawl');
 
+    // CORS 프록시 설정 (Cloudflare Worker)
+    const PROXY_URL = 'https://cors-proxy.jeju-travel.workers.dev/?url='; 
+
+    function getProxiedUrl(originalUrl) {
+        if (!originalUrl || originalUrl.includes('poke-ball.png')) return originalUrl;
+        return PROXY_URL + encodeURIComponent(originalUrl);
+    }
+
     // 데이터 로드
     function loadData() {
         try {
@@ -90,9 +98,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const card = document.createElement('article');
                 card.className = 'card';
                 card.id = `item-${i + index}`;
+                const proxiedImg = getProxiedUrl(item.image);
                 card.innerHTML = `
                     <div class="card-img-wrap">
-                        <img src="${item.image}" alt="${item.title}" loading="lazy" onclick="openImageModal('${item.image}')" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png';">
+                        <img src="${proxiedImg}" alt="${item.title}" loading="lazy" crossorigin="anonymous" onclick="openImageModal('${proxiedImg}')" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png';">
                     </div>
                 `;
                 innerGrid.appendChild(card);
@@ -127,9 +136,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const mm = item.date.substring(5, 7);
                 const dd = item.date.substring(8, 10);
                 const shortDate = `${yy}/${mm}/${dd}`;
+                const proxiedImg = getProxiedUrl(item.image);
                 trs += `
                     <tr>
-                        <td style="width: 45px;"><img src="${item.image}" class="table-img" onclick="openImageModal('${item.image}')" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png';"></td>
+                        <td style="width: 45px;"><img src="${proxiedImg}" class="table-img" crossorigin="anonymous" onclick="openImageModal('${proxiedImg}')" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png';"></td>
                         <td style="font-weight: 600;">${item.title}</td>
                         <td>${shortDate}</td>
                         <td>${item.place || '-'}</td>
@@ -319,7 +329,7 @@ async function captureCurrentView() {
                 backgroundColor: "#ffffff",
                 scale: 2,
                 logging: false,
-                imageTimeout: 5000
+                imageTimeout: 10000
             });
             const link = document.createElement('a');
             link.download = `Jeju_LostItems_Page${i+1}_${new Date().toISOString().slice(0,10)}.png`;
