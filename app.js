@@ -99,7 +99,6 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td>${index + 1}</td>
                 <td><img src="${item.image}" class="table-img" onclick="openImageModal('${item.image}')" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png';"></td>
                 <td style="font-weight: 600;">${item.title}</td>
                 <td>${shortDate}</td>
@@ -141,9 +140,8 @@ document.addEventListener('DOMContentLoaded', () => {
     btnExport.addEventListener('click', () => {
         if (allItems.length === 0) return alert('没有可导出的数据。');
         
-        const headers = ['序号', '物品名称', '拾获日期', '拾获地点', '类别'];
-        const rows = allItems.map((item, idx) => [
-            idx + 1,
+        const headers = ['物品名称', '拾获日期', '拾获地点', '类别'];
+        const rows = allItems.map((item) => [
             `"${item.title.replace(/"/g, '""')}"`,
             item.date,
             `"${(item.place || '').replace(/"/g, '""')}"`,

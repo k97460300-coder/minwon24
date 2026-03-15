@@ -139,6 +139,7 @@ header {
 .filter-bar h2 {
     font-size: 1.5rem;
     font-weight: 600;
+    text-align: center;
 }
 
 .controls {
@@ -460,13 +461,6 @@ header {
 
 .btn-share svg {
     stroke: var(--accent);
-}
-
-/* Explicit sizing for table columns */
-.excel-table th:nth-child(1),
-.excel-table td:nth-child(1) {
-    width: 60px;
-    min-width: 60px;
 }
 
 /* Footer */
