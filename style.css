@@ -155,9 +155,11 @@ header {
     border-radius: 12px;
     border: 1px solid var(--glass-border);
     display: flex;
+    width: 100%;
 }
 
 .btn-view {
+    flex: 1;
     padding: 0.6rem 1.5rem;
     border-radius: 8px;
     border: none;
@@ -275,7 +277,7 @@ header {
 .items-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 0.5rem;
+    gap: 0.25rem; /* Reduced gap slightly to fit more on screen */
 }
 
 .card {
