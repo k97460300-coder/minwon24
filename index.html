@@ -23,14 +23,19 @@
                     <button id="view-card" class="btn-view active">卡片视图</button>
                     <button id="view-table" class="btn-view">表格视图 (Excel)</button>
                 </div>
-                <button id="btn-export" class="btn-primary">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                    保存为 Excel (CSV)
-                </button>
-                <button id="btn-crawl" class="btn-secondary">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
-                    同步数据
-                </button>
+                <div class="action-buttons-row" style="display: flex; gap: 10px; width: 100%; max-width: 100%; overflow-x: auto; padding-bottom: 5px;">
+                    <button id="btn-export" class="btn-primary">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        保存为 Excel
+                    </button>
+                    <button class="btn-share" id="btn-capture-table" onclick="captureTable()" style="margin-top: 0; white-space: nowrap;">
+                        截图保存为 16:9
+                    </button>
+                    <button id="btn-crawl" class="btn-secondary">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                        同步数据
+                    </button>
+                </div>
                 <div class="search-box">
                     <input type="text" id="search-input" placeholder="搜索物品名称...">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
@@ -46,9 +51,6 @@
             <div id="items-grid" class="items-grid"></div>
             <div id="items-table-wrapper" class="items-table-wrapper" style="display: none;">
                 <div id="table-pages-container"></div>
-                <div class="table-actions">
-                    <button class="btn-share" onclick="captureTable()">截图保存为 16:9 图片</button>
-                </div>
             </div>
         </div>
     </main>

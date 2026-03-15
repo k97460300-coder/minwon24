@@ -294,11 +294,11 @@ header {
     font-weight: 600;
 }
 
-/* Grid & Cards */
+/* Grid & Cards Container */
 .items-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.25rem; /* Reduced gap slightly to fit more on screen */
+    display: flex;
+    flex-direction: column;
+    gap: 0; /* Gap is managed by table-page-169 margins */
 }
 
 .card {
@@ -358,7 +358,7 @@ header {
     border: 2px solid var(--accent);
     border-radius: 16px;
     padding: 1rem;
-    margin-bottom: 2rem;
+    margin-bottom: 0.5rem; /* Reduced gap between blocks */
     display: flex;
     flex-direction: column;
 }
@@ -569,20 +569,26 @@ footer {
     
     /* Compact Table for Mobile */
     .table-page-169 {
-        padding: 0.5rem;
+        padding: 0.2rem;
+        border-width: 1px;
     }
     
     .excel-table th, .excel-table td {
-        padding: 0.5rem 0.2rem;
-        font-size: 0.85rem;
+        padding: 0.2rem 0.1rem;
+        font-size: 0.75rem;
     }
     
     .table-img {
-        width: 45px;
-        height: 45px;
+        width: 35px;
+        height: 35px;
     }
     
     .stats-inline {
         font-size: 0.85rem;
+    }
+    
+    .btn-primary, .btn-secondary, .btn-share {
+        padding: 0.6rem 0.8rem;
+        font-size: 0.8rem;
     }
 }

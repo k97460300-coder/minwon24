@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 카드 렌더링
+    // 카드 렌더링 - 16:9 다중 페이지 분할 적용
     function renderCards(items) {
         itemsGrid.innerHTML = '';
         if (items.length === 0) {
@@ -69,17 +69,37 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        items.forEach((item, index) => {
-            const card = document.createElement('article');
-            card.className = 'card';
-            card.id = `item-${index}`;
-            card.innerHTML = `
-                <div class="card-img-wrap">
-                    <img src="${item.image}" alt="${item.title}" loading="lazy" onclick="openImageModal('${item.image}')" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png';">
-                </div>
-            `;
-            itemsGrid.appendChild(card);
-        });
+        // 3열 x 2-3행 정도가 적당하므로 한 블록당 9~12개 할당
+        const ITEMS_PER_PAGE_CARD = 12; // 3x4 layout
+        for (let i = 0; i < items.length; i += ITEMS_PER_PAGE_CARD) {
+            const pageItems = items.slice(i, i + ITEMS_PER_PAGE_CARD);
+            
+            // 16:9 래퍼 생성
+            const wrapper = document.createElement('div');
+            wrapper.className = 'table-page-169';
+            
+            // 실제 카드들이 담길 이너 그리드 생성
+            const innerGrid = document.createElement('div');
+            innerGrid.style.display = 'grid';
+            // CSS의 모바일 미디어 쿼리(repeat(3,1fr))를 상속받거나 하드코딩
+            innerGrid.style.gridTemplateColumns = 'repeat(3, 1fr)';
+            innerGrid.style.gap = '0.25rem';
+            
+            pageItems.forEach((item, index) => {
+                const card = document.createElement('article');
+                card.className = 'card';
+                card.id = `item-${i + index}`;
+                card.innerHTML = `
+                    <div class="card-img-wrap">
+                        <img src="${item.image}" alt="${item.title}" loading="lazy" onclick="openImageModal('${item.image}')" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png';">
+                    </div>
+                `;
+                innerGrid.appendChild(card);
+            });
+            
+            wrapper.appendChild(innerGrid);
+            itemsGrid.appendChild(wrapper);
+        }
     }
 
     // 테이블 렌더링 (엑셀 방식) - 16:9 분할 렌더링
