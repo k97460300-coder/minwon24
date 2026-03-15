@@ -559,8 +559,8 @@ footer {
     }
     
     .items-grid {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 0.25rem;
+        grid-template-columns: repeat(1, 1fr);
+        gap: 0.5rem;
     }
     
     .container {
