@@ -354,15 +354,20 @@ header {
 
 /* Table View 16:9 Format Wrapper */
 .table-page-169 {
-    aspect-ratio: 16 / 9;
     background: var(--bg-card);
     border: 2px solid var(--accent);
     border-radius: 16px;
     padding: 1rem;
     margin-bottom: 2rem;
-    overflow: hidden;
     display: flex;
     flex-direction: column;
+}
+
+@media (min-width: 768px) {
+    .table-page-169 {
+        aspect-ratio: 16 / 9;
+        overflow: hidden;
+    }
 }
 
 .excel-table {

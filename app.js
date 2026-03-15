@@ -93,8 +93,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // 스마트폰 캡처를 고려하여 16:9 비율 화면에 아기자기하게 들어갈 수 있도록 6~7개씩 분할
-        const ITEMS_PER_PAGE = 7; 
+        // 스마트폰 캡처를 고려하여 16:9 비율 화면에 아기자기하게 들어갈 수 있도록 5개씩 분할
+        const ITEMS_PER_PAGE = 5; 
         for (let i = 0; i < items.length; i += ITEMS_PER_PAGE) {
             const pageItems = items.slice(i, i + ITEMS_PER_PAGE);
             const pageDiv = document.createElement('div');
@@ -257,8 +257,15 @@ async function captureTable() {
     clonedPages.style.gap = '20px';
     
     // 강제 폰트 색상 적용 (캡처 화질 향상)
-    clonedPages.querySelectorAll('th, td, .table-page-169').forEach(el => {
+    clonedPages.querySelectorAll('th, td').forEach(el => {
         el.style.color = 'black';
+    });
+    
+    // 캡처 화면에서는 모바일 화면 크기와 관계없이 강제로 16:9 고정 박스 형태 유지
+    clonedPages.querySelectorAll('.table-page-169').forEach(el => {
+        el.style.color = 'black';
+        el.style.aspectRatio = '16 / 9';
+        el.style.overflow = 'hidden';
     });
     
     captureWrapper.appendChild(clonedPages);
