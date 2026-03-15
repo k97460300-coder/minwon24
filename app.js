@@ -1,3 +1,7 @@
+// 전역 상태 변수
+let allItems = [];
+let currentView = 'card';
+
 document.addEventListener('DOMContentLoaded', () => {
     const itemsGrid = document.getElementById('items-grid');
     const tableBody = document.getElementById('table-body');
@@ -13,9 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnTable = document.getElementById('view-table');
     const btnExport = document.getElementById('btn-export');
     const btnCrawl = document.getElementById('btn-crawl');
-
-    let allItems = [];
-    let currentView = 'card';
 
     // 데이터 로드
     function loadData() {
@@ -72,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // 3열 레이아웃이므로 한 9:16 블록당 12개 할당 (3x4)
         const ITEMS_PER_PAGE_CARD = 12; // 3x4 layout
         for (let i = 0; i < items.length; i += ITEMS_PER_PAGE_CARD) {
-            const pageItems = items.slice(i, i + ITEMS_PER_PAGE_CARD);
+            const pageItems = items.slice(i, i + ITEMS_PER_PER_PAGE_CARD);
             
             // 9:16 래퍼 생성
             const wrapper = document.createElement('div');
@@ -187,7 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btnExport.addEventListener('click', () => {
         if (allItems.length === 0) return alert('没有可导出的数据。');
         
-        const headers = ['物品名称', '拾获日期', '拾获地点', '类别'];
+        const headers = ['物品名称', '拾获日期', '拾获地点', '存储位置', '类别'];
         const rows = allItems.map((item) => [
             `"${item.title.replace(/"/g, '""')}"`,
             item.date,
@@ -217,7 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // 실제 환경에서는 백엔드 API 호출이 필요함.
             // 여기서는 사용자에게 가이드 제공 및 가상 딜레이
             setTimeout(() => {
-                alert('数据同步已开始。请稍后刷新页面。\n(本地环境: 需要配置 node execution/crawl_lost_items.js 在后台运行)');
+                alert('数据同步已开始。请稍후刷新页面。\n(本地环境: 需要配置 node execution/crawl_lost_items.js 在后台运行)');
                 btnCrawl.classList.remove('loading');
                 btnCrawl.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg> 同步数据`;
             }, 1500);
@@ -227,15 +228,15 @@ document.addEventListener('DOMContentLoaded', () => {
     loadData();
 });
 
-// 전역 캡처 함수 (샤오홍슈용)
+// 전역 캡처 함수 (샤오홍슈용 - 사용 시 개별 캡처)
 async function captureCard(cardId, fileName) {
     const card = document.getElementById(cardId);
     if (!card) return;
     card.classList.add('share-mode');
     try {
         const canvas = await html2canvas(card, {
-            useCORS: false,
-            allowTaint: true,
+            useCORS: true,
+            allowTaint: false,
             backgroundColor: "#ffffff",
             scale: 2
         });
@@ -250,7 +251,7 @@ async function captureCard(cardId, fileName) {
     }
 }
 
-// 캡처 함수 (현재 표시된 뷰의 각 9:16 페이지를 각각 이미지로 캡처)
+// 전역 캡처 함수 (현재 표시된 뷰의 각 9:16 페이지를 각각 이미지로 캡처)
 async function captureCurrentView() {
     let targetContainer = null;
     let titlePrefix = '';
@@ -291,13 +292,13 @@ async function captureCurrentView() {
         title.innerText = `拾获的遗失物品 - ${titlePrefix} (${new Date().toLocaleDateString()}) - ${i+1}/${pages.length}`;
         title.style.textAlign = 'center';
         title.style.marginBottom = '30px';
-        title.style.fontSize = '2rem';
+        title.style.fontSize = '2.5rem';
         title.style.color = '#111';
         captureWrapper.appendChild(title);
 
         const clonedPage = pageDom.cloneNode(true);
-        // 강제 폰트 색상 및 9:16 적용 (캡처 화질 향상)
-        clonedPage.querySelectorAll('th, td, .card').forEach(el => {
+        // 강제 폰트 색상 및 스타일 적용 (캡처 화질 향상)
+        clonedPage.querySelectorAll('th, td, .card, .title').forEach(el => {
             el.style.color = 'black';
         });
         
@@ -305,17 +306,20 @@ async function captureCurrentView() {
         clonedPage.style.color = 'black';
         clonedPage.style.aspectRatio = '9 / 16';
         clonedPage.style.overflow = 'hidden';
-        clonedPage.style.margin = '0';
+        clonedPage.style.margin = '0 auto';
+        clonedPage.style.display = currentView === 'card' ? 'grid' : 'block';
         
         captureWrapper.appendChild(clonedPage);
         document.body.appendChild(captureWrapper);
 
         try {
             const canvas = await html2canvas(captureWrapper, {
-                useCORS: false,
-                allowTaint: true,
+                useCORS: true,
+                allowTaint: false,
                 backgroundColor: "#ffffff",
-                scale: 2
+                scale: 2,
+                logging: false,
+                imageTimeout: 5000
             });
             const link = document.createElement('a');
             link.download = `Jeju_LostItems_Page${i+1}_${new Date().toISOString().slice(0,10)}.png`;
@@ -323,7 +327,7 @@ async function captureCurrentView() {
             link.click();
             
             // 모바일/브라우저 다운로드 연달아 수행 시 막힘 방지 딜레이
-            await new Promise(r => setTimeout(r, 800));
+            await new Promise(r => setTimeout(r, 600));
         } catch (err) {
             console.error(`Capture failed for page ${i+1}:`, err);
         } finally {
