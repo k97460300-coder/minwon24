@@ -69,8 +69,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // 1열 레이아웃이므로 한 9:16 블록당 8개 정도 할당
-        const ITEMS_PER_PAGE_CARD = 8; // 1x8 layout
+        // 3열 레이아웃이므로 한 9:16 블록당 12개 할당 (3x4)
+        const ITEMS_PER_PAGE_CARD = 12; // 3x4 layout
         for (let i = 0; i < items.length; i += ITEMS_PER_PAGE_CARD) {
             const pageItems = items.slice(i, i + ITEMS_PER_PAGE_CARD);
             
@@ -81,9 +81,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // 실제 카드들이 담길 이너 그리드 생성
             const innerGrid = document.createElement('div');
             innerGrid.style.display = 'grid';
-            // CSS의 모바일 미디어 쿼리(repeat(1,1fr))를 상속받거나 하드코딩
-            innerGrid.style.gridTemplateColumns = 'repeat(1, 1fr)';
-            innerGrid.style.gap = '0.5rem';
+            // 3열 x 4행 하드코딩
+            innerGrid.style.gridTemplateColumns = 'repeat(3, 1fr)';
+            innerGrid.style.gap = '0.25rem';
             
             pageItems.forEach((item, index) => {
                 const card = document.createElement('article');
@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const shortDate = `${yy}/${mm}/${dd}`;
                 trs += `
                     <tr>
-                        <td style="width: 80px;"><img src="${item.image}" class="table-img" onclick="openImageModal('${item.image}')" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png';"></td>
+                        <td style="width: 45px;"><img src="${item.image}" class="table-img" onclick="openImageModal('${item.image}')" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png';"></td>
                         <td style="font-weight: 600;">${item.title}</td>
                         <td>${shortDate}</td>
                         <td>${item.place || '-'}</td>
@@ -140,7 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <table class="excel-table">
                     <thead>
                         <tr>
-                            <th>图片</th>
+                            <th style="width: 45px;">图片</th>
                             <th>物品名称</th>
                             <th>拾获日期</th>
                             <th>拾获地点</th>
@@ -250,7 +250,7 @@ async function captureCard(cardId, fileName) {
     }
 }
 
-// 캡처 함수 (현재 표시된 뷰 9:16 비율 캡처)
+// 캡처 함수 (현재 표시된 뷰의 각 9:16 페이지를 각각 이미지로 캡처)
 async function captureCurrentView() {
     let targetContainer = null;
     let titlePrefix = '';
@@ -265,58 +265,74 @@ async function captureCurrentView() {
     
     if (!targetContainer) return;
 
-    const captureWrapper = document.createElement('div');
-    captureWrapper.style.position = 'absolute';
-    captureWrapper.style.left = '-9999px';
-    captureWrapper.style.top = '0';
-    captureWrapper.style.background = '#ffffff';
-    captureWrapper.style.padding = '40px';
-    captureWrapper.style.width = '1080px';
-    
-    const title = document.createElement('h2');
-    title.innerText = `拾获的遗失物品 - ${titlePrefix} (${new Date().toLocaleDateString()})`;
-    title.style.textAlign = 'center';
-    title.style.marginBottom = '30px';
-    title.style.fontSize = '2rem';
-    title.style.color = '#111';
-    captureWrapper.appendChild(title);
-
-    const clonedPages = targetContainer.cloneNode(true);
-    clonedPages.style.display = 'flex';
-    clonedPages.style.flexDirection = 'column';
-    clonedPages.style.gap = '20px';
-    
-    // 강제 폰트 색상 및 9:16 적용 (캡처 화질 향상)
-    clonedPages.querySelectorAll('th, td').forEach(el => {
-        el.style.color = 'black';
-    });
-    
-    // 캡처 화면에서는 모바일 화면 크기와 관계없이 강제로 9:16 고정 박스 형태 유지
-    clonedPages.querySelectorAll('.table-page-916').forEach(el => {
-        el.style.color = 'black';
-        el.style.aspectRatio = '9 / 16';
-        el.style.overflow = 'hidden';
-    });
-    
-    captureWrapper.appendChild(clonedPages);
-    document.body.appendChild(captureWrapper);
-
-    try {
-        const canvas = await html2canvas(captureWrapper, {
-            useCORS: false,
-            allowTaint: true,
-            backgroundColor: "#ffffff",
-            scale: 2
-        });
-        const link = document.createElement('a');
-        link.download = `Jeju_LostItems_9-16_${new Date().toISOString().slice(0,10)}.png`;
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-    } catch (err) {
-        console.error('Capture failed:', err);
-    } finally {
-        document.body.removeChild(captureWrapper);
+    const pages = targetContainer.querySelectorAll('.table-page-916');
+    if (pages.length === 0) {
+        alert('没有可以保存的内容。');
+        return;
     }
+
+    const btn = document.getElementById('btn-capture-table');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '处理中...';
+    btn.disabled = true;
+
+    for (let i = 0; i < pages.length; i++) {
+        const pageDom = pages[i];
+
+        const captureWrapper = document.createElement('div');
+        captureWrapper.style.position = 'absolute';
+        captureWrapper.style.left = '-9999px';
+        captureWrapper.style.top = '0';
+        captureWrapper.style.background = '#ffffff';
+        captureWrapper.style.padding = '40px';
+        captureWrapper.style.width = '1080px';
+        
+        const title = document.createElement('h2');
+        title.innerText = `拾获的遗失物品 - ${titlePrefix} (${new Date().toLocaleDateString()}) - ${i+1}/${pages.length}`;
+        title.style.textAlign = 'center';
+        title.style.marginBottom = '30px';
+        title.style.fontSize = '2rem';
+        title.style.color = '#111';
+        captureWrapper.appendChild(title);
+
+        const clonedPage = pageDom.cloneNode(true);
+        // 강제 폰트 색상 및 9:16 적용 (캡처 화질 향상)
+        clonedPage.querySelectorAll('th, td, .card').forEach(el => {
+            el.style.color = 'black';
+        });
+        
+        // 캡처 화면에서는 모바일 화면 크기와 관계없이 강제로 9:16 고정 박스 형태 유지
+        clonedPage.style.color = 'black';
+        clonedPage.style.aspectRatio = '9 / 16';
+        clonedPage.style.overflow = 'hidden';
+        clonedPage.style.margin = '0';
+        
+        captureWrapper.appendChild(clonedPage);
+        document.body.appendChild(captureWrapper);
+
+        try {
+            const canvas = await html2canvas(captureWrapper, {
+                useCORS: false,
+                allowTaint: true,
+                backgroundColor: "#ffffff",
+                scale: 2
+            });
+            const link = document.createElement('a');
+            link.download = `Jeju_LostItems_Page${i+1}_${new Date().toISOString().slice(0,10)}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            
+            // 모바일/브라우저 다운로드 연달아 수행 시 막힘 방지 딜레이
+            await new Promise(r => setTimeout(r, 800));
+        } catch (err) {
+            console.error(`Capture failed for page ${i+1}:`, err);
+        } finally {
+            document.body.removeChild(captureWrapper);
+        }
+    }
+
+    btn.innerHTML = originalText;
+    btn.disabled = false;
 }
 
 // 이미지 확대 관련 전역 함수
