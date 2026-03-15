@@ -92,7 +92,7 @@ async function crawlLostItems() {
                 const fields = doc.fields || {};
                 const item = {
                     id: fields.PKUP_CMDTY_MNG_ID,
-                    title: translate(fields.ITEM_CN),
+                    title: fields.ITEM_CN, // 품명은 한글로 유지
                     date: fields.LOST_CMDTY_PKUP_YMD,
                     category: translate(fields.PRDLST_NM || "기타"),
                     place: fields.PKUP_PLC_SE_NM,
@@ -124,7 +124,7 @@ async function crawlLostItems() {
         uniqueItems = [
             {
                 id: "SAMPLE_001",
-                title: "黑色皮革钱包",
+                title: "[샘플] 검정색 가죽 지갑",
                 date: new Date().toISOString().split('T')[0],
                 category: "钱包",
                 place: "济州机场",

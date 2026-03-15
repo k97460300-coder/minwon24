@@ -1,7 +1,7 @@
 window.lostItems = [
   {
     "id": "F2026031500002677",
-    "title": "卡",
+    "title": "카드",
     "date": "2026-03-15",
     "category": "其他",
     "place": "NH공원",
@@ -11,7 +11,7 @@ window.lostItems = [
   },
   {
     "id": "V0001512L03150028",
-    "title": "黑色 유선이어폰줄(其他)",
+    "title": "검정 유선이어폰줄(기타)",
     "date": "2026-03-15",
     "category": "其他",
     "place": "공항",
@@ -21,7 +21,7 @@ window.lostItems = [
   },
   {
     "id": "F2026031500002213",
-    "title": "卡",
+    "title": "카드",
     "date": "2026-03-15",
     "category": "其他",
     "place": "선관위 사거리 인근",
@@ -31,7 +31,7 @@ window.lostItems = [
   },
   {
     "id": "V0001512L03150042",
-    "title": "무신사종이购物袋",
+    "title": "무신사종이쇼핑백",
     "date": "2026-03-15",
     "category": "其他",
     "place": "공항",
@@ -51,7 +51,7 @@ window.lostItems = [
   },
   {
     "id": "V0001512L03150060",
-    "title": "白色 비닐 购物袋",
+    "title": "흰색 비닐 쇼핑백",
     "date": "2026-03-15",
     "category": "其他",
     "place": "공항",
@@ -61,7 +61,7 @@ window.lostItems = [
   },
   {
     "id": "V0001512L03150006",
-    "title": "비닐 购物袋",
+    "title": "비닐 쇼핑백",
     "date": "2026-03-15",
     "category": "其他",
     "place": "공항",
@@ -91,7 +91,7 @@ window.lostItems = [
   },
   {
     "id": "F2026031500002347",
-    "title": "男士 钱包(더블엠 钱包)",
+    "title": "남성용 지갑(더블엠 지갑)",
     "date": "2026-03-15",
     "category": "其他",
     "place": "60바7058",
@@ -101,7 +101,7 @@ window.lostItems = [
   },
   {
     "id": "F2026031500002601",
-    "title": "Galaxy탭",
+    "title": "갤럭시탭",
     "date": "2026-03-15",
     "category": "其他",
     "place": "동복리 버스정류장",
@@ -111,7 +111,7 @@ window.lostItems = [
   },
   {
     "id": "F2026031500002591",
-    "title": "钱包(卡,주민등록증)",
+    "title": "지갑(카드,주민등록증)",
     "date": "2026-03-15",
     "category": "其他",
     "place": "동문로터리",
@@ -121,7 +121,7 @@ window.lostItems = [
   },
   {
     "id": "V0001512L03150026",
-    "title": "기업은행 卡",
+    "title": "기업은행 카드",
     "date": "2026-03-15",
     "category": "其他",
     "place": "공항",
@@ -131,7 +131,7 @@ window.lostItems = [
   },
   {
     "id": "F2026031500002423",
-    "title": "黑色 반钱包",
+    "title": "검정색 반지갑",
     "date": "2026-03-15",
     "category": "其他",
     "place": "가든주유소",
@@ -151,7 +151,7 @@ window.lostItems = [
   },
   {
     "id": "V0001512L03150036",
-    "title": "립밤(其他)",
+    "title": "립밤(기타)",
     "date": "2026-03-15",
     "category": "其他",
     "place": "공항",
@@ -181,7 +181,7 @@ window.lostItems = [
   },
   {
     "id": "V0001512L03150070",
-    "title": "국민卡",
+    "title": "국민카드",
     "date": "2026-03-15",
     "category": "其他",
     "place": "공항",
