@@ -116,7 +116,8 @@ async function crawlLostItems() {
                         item.title = item.title.replace(/^\d+\.?\s*/, '');
                     }
 
-                    if (item.id && item.title) {
+                    // 이미지가 있는 항목(STRG_FILE_PATH가 존재하는 항목)만 추가
+                    if (item.id && item.title && fields.STRG_FILE_PATH) {
                         allItems.push(item);
                     }
                 });

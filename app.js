@@ -28,11 +28,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const filterInfo = window.filterInfo || { region: '전국', startDate: '-', endDate: '-' };
             
             totalCount.innerText = allItems.length;
-            updateDate.innerText = new Date().toLocaleDateString('zh-CN');
             
-            if (filterBadge && dateRangeSpan) {
-                dateRangeSpan.innerText = `${filterInfo.region} | ${filterInfo.startDate} ~ ${filterInfo.endDate}`;
-                filterBadge.style.display = 'inline-block';
+            if (dateRangeSpan) {
+                dateRangeSpan.innerText = `${filterInfo.startDate} ~ ${filterInfo.endDate}`;
             }
             
             renderView();
@@ -78,16 +76,6 @@ document.addEventListener('DOMContentLoaded', () => {
             card.innerHTML = `
                 <div class="card-img-wrap">
                     <img src="${item.image}" alt="${item.title}" loading="lazy" onclick="openImageModal('${item.image}')" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png';">
-                    <span class="card-date">${item.date}</span>
-                </div>
-                <div class="card-body">
-                    <div class="category">${item.category || '其他物品'}</div>
-                    <h3 class="title">${item.title}</h3>
-                    <div class="info-row"><span class="label">拾获地点</span><span class="val">${item.place || '-'}</span></div>
-                    <div class="info-row" style="margin-bottom: 1.2rem;"><span class="label">保管地点</span><span class="val">${item.storage || '-'}</span></div>
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <button class="btn-share" onclick="captureCard('item-${index}', '${item.title}')">小红书专用截图</button>
-                    </div>
                 </div>
             `;
             itemsGrid.appendChild(card);
