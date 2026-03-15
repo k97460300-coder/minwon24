@@ -59,6 +59,25 @@ async function crawlLostItems() {
 
     let allItems = [];
     let pageStart = 1;
+
+    // 이미지 저장 폴더 준비 (기존 폴더 초기화)
+    const imagesDir = path.join(__dirname, '..', 'images');
+    if (fs.existsSync(imagesDir)) {
+        fs.rmSync(imagesDir, { recursive: true, force: true });
+    }
+    fs.mkdirSync(imagesDir, { recursive: true });
+
+    async function downloadImage(url, destPath) {
+        try {
+            const response = await axios.get(url, { responseType: 'arraybuffer', timeout: 10000 });
+            fs.writeFileSync(destPath, response.data);
+            return true;
+        } catch (e) {
+            console.error(`[WARN] Failed to download image ${url} - ${e.message}`);
+            return false;
+        }
+    }
+
     const pageCount = 1000;
     let totalCount = 0;
 
@@ -98,17 +117,20 @@ async function crawlLostItems() {
                     console.log(`[CRAWL] Total items reported by API: ${totalCount}`);
                 }
 
-                documents.forEach(doc => {
+                for (const doc of documents) {
                     const fields = doc.fields || {};
+                    const id = fields.PKUP_CMDTY_MNG_ID;
+                    const originalImageUrl = `https://minwon24.police.go.kr/lost112Minwon/selectLostInfoAttachFile.do?pkupCmdtyMngId=${id}&fileId=${fields.STRG_FILE_PATH}`;
+
                     const item = {
-                        id: fields.PKUP_CMDTY_MNG_ID,
-                        title: fields.ITEM_CN, // 품명은 한글로 유지
+                        id: id,
+                        title: fields.ITEM_CN, 
                         date: fields.LOST_CMDTY_PKUP_YMD,
                         category: translate(fields.PRDLST_NM || "기타"),
                         place: fields.PKUP_PLC_SE_NM,
                         storage: fields.KPNG_PLC_NM,
                         owner: fields.TEL || "-",
-                        image: `https://minwon24.police.go.kr/lost112Minwon/selectLostInfoAttachFile.do?pkupCmdtyMngId=${fields.PKUP_CMDTY_MNG_ID}&fileId=${fields.STRG_FILE_PATH}`
+                        image: originalImageUrl // Fallback URL
                     };
 
                     // 제목 정제 (숫자 접두사 제거)
@@ -118,9 +140,20 @@ async function crawlLostItems() {
 
                     // 이미지가 있는 항목(STRG_FILE_PATH가 존재하는 항목)만 추가
                     if (item.id && item.title && fields.STRG_FILE_PATH) {
-                        allItems.push(item);
+                        const localImgName = `${item.id}.jpg`;
+                        const localImgPath = path.join(imagesDir, localImgName);
+                        
+                        // 이미지 1건 다운로드
+                        const dlSuccess = await downloadImage(originalImageUrl, localImgPath);
+                        if (dlSuccess) {
+                            item.image = `images/${localImgName}`;
+                            allItems.push(item);
+                        } else {
+                            // 다운로드 실패 시 오리지널 링크 그대로 푸시하거나 스킵
+                            allItems.push(item);
+                        }
                     }
-                });
+                }
 
                 pageStart += pageCount;
                 if (pageStart > totalCount || documents.length === 0) {
