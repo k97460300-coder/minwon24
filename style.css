@@ -536,4 +536,19 @@ footer {
     .logo { font-size: 2.2rem; }
     .stats-glass { flex-direction: column; padding: 1.5rem; gap: 1rem; border-radius: 24px; }
     .stat-divider { display: none; }
+    
+    /* Text Wrapping Fixes */
+    .card-body .title, .excel-table td {
+        word-break: break-all;
+        overflow-wrap: break-word;
+    }
+    
+    .items-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .container {
+        padding: 0 1rem;
+    }
 }

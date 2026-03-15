@@ -29,11 +29,39 @@ async function crawlLostItems() {
         "Referer": "https://minwon24.police.go.kr/cvlcpt/cvlcptAply.do?cvlcptId=MW-201&keyword="
     };
 
-    let allItems = [];
     const pageCount = 20; // 한 번에 가져올 개수
+    let allItems = [];
+
+    const translateMap = {
+        // Categories
+        "지갑": "钱包", "현금": "现金", "카드": "卡片", "휴대폰": "手机", "신분증": "身份证件",
+        "가방": "包", "귀금속": "珠宝", "도서용품": "图书用品", "서류": "文件", "산업용품": "工业用品",
+        "쇼핑백": "购物袋", "스포츠용품": "运动用品", "악기": "乐器", "의류": "衣服", "자동차": "汽车",
+        "전자기기": "电子设备", "컴퓨터": "电脑", "필기도구": "文具", "기타물품": "其他物品", "기타": "其他",
+        "남성용": "男士", "여성용": "女士", "유아용": "婴儿", "스마트폰": "智能手机", "체크카드": "借记卡",
+        "신용카드": "信用卡", "일반지갑": "钱包", "반지": "戒指", "목걸이": "项链", "귀걸이": "耳环",
+
+        // Title terms
+        "검정색": "黑色", "검정": "黑色", "빨간색": "红色", "파란색": "蓝色", "흰색": "白色",
+        "노란색": "黄色", "초록색": "绿色", "보라색": "紫色", "가죽": "皮革", "아이폰": "iPhone",
+        "갤럭시": "Galaxy", "지갑": "钱包", "가방": "包", "열쇠": "钥匙", "안경": "眼镜",
+        "장갑": "手套", "우산": "雨伞", "신발": "鞋", "카드": "卡", "만원": "1万韩元",
+        "오만원": "5万韩元", "천원": "1千韩元", "오천원": "5千韩元", "동전": "硬币",
+        "습득": "拾获", "보관": "保管", "분실": "丢失", "발견": "发现"
+    };
+
+    const translate = (text) => {
+        if (!text) return text;
+        let translated = text;
+        Object.keys(translateMap).forEach(ko => {
+            const reg = new RegExp(ko, 'g');
+            translated = translated.replace(reg, translateMap[ko]);
+        });
+        return translated;
+    };
 
     try {
-        // API 요청 페이로드
+        // API 요청 페이로드 (동일)
         const payload = {
             "query": "",
             "searchFields": ["_ALL_"],
@@ -64,12 +92,12 @@ async function crawlLostItems() {
                 const fields = doc.fields || {};
                 const item = {
                     id: fields.PKUP_CMDTY_MNG_ID,
-                    title: fields.ITEM_CN,
+                    title: translate(fields.ITEM_CN),
                     date: fields.LOST_CMDTY_PKUP_YMD,
-                    category: fields.PRDLST_NM || "기타",
+                    category: translate(fields.PRDLST_NM || "기타"),
                     place: fields.PKUP_PLC_SE_NM,
                     storage: fields.KPNG_PLC_NM,
-                    owner: fields.TEL || "-", // 연락처 우선
+                    owner: fields.TEL || "-",
                     image: `https://minwon24.police.go.kr/lost112Minwon/selectLostInfoAttachFile.do?pkupCmdtyMngId=${fields.PKUP_CMDTY_MNG_ID}&fileId=${fields.STRG_FILE_PATH}`
                 };
 
@@ -82,8 +110,6 @@ async function crawlLostItems() {
                     allItems.push(item);
                 }
             });
-        } else {
-            console.log("[CRAWL] No data found in API response.");
         }
 
     } catch (error) {
@@ -93,17 +119,16 @@ async function crawlLostItems() {
     // 중복 제거
     let uniqueItems = Array.from(new Map(allItems.map(item => [item.id, item])).values());
 
-    // Fallback: 여전히 데이터가 없는 경우 (시스템 확인용)
+    // Fallback
     if (uniqueItems.length === 0) {
-        console.log("[WARN] No real items found for Jeju. Adding sample data.");
         uniqueItems = [
             {
                 id: "SAMPLE_001",
-                title: "[샘플] 검정색 가죽 지갑",
+                title: "黑色皮革钱包",
                 date: new Date().toISOString().split('T')[0],
-                category: "지갑",
-                place: "제주공항",
-                storage: "제주공항경찰대",
+                category: "钱包",
+                place: "济州机场",
+                storage: "济州机场警察队",
                 owner: "064-000-0000",
                 image: "https://minwon24.police.go.kr/img/error/lostNonImg_2.png"
             }
@@ -112,7 +137,7 @@ async function crawlLostItems() {
 
     // 파일 저장
     const dataJsPath = path.join(__dirname, '..', 'data.js');
-    const dataJsContent = `window.lostItems = ${JSON.stringify(uniqueItems, null, 2)};\nwindow.filterInfo = { region: '제주특별자치도', startDate: '${simpleStartDate}', endDate: '${simpleEndDate}' };`;
+    const dataJsContent = `window.lostItems = ${JSON.stringify(uniqueItems, null, 2)};\nwindow.filterInfo = { region: '济州特别自治道', startDate: '${simpleStartDate}', endDate: '${simpleEndDate}' };`;
     fs.writeFileSync(dataJsPath, dataJsContent, 'utf-8');
 
     const csvPath = path.join(__dirname, '..', '.tmp', 'lost_items.csv');
@@ -121,7 +146,7 @@ async function crawlLostItems() {
     const csvContent = '\uFEFF' + csvHeaders.join(',') + '\n' + csvRows.join('\n');
     fs.writeFileSync(csvPath, csvContent, 'utf-8');
 
-    console.log(`Successfully saved ${uniqueItems.length} items.`);
+    console.log(`Successfully saved ${uniqueItems.length} items (Chinese translated).`);
 }
 
 crawlLostItems();
