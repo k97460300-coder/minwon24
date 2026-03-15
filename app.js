@@ -18,8 +18,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnExport = document.getElementById('btn-export');
     const btnCrawl = document.getElementById('btn-crawl');
 
-    // CORS 프록시 설정 (Cloudflare Worker)
-    const PROXY_URL = 'https://cors-proxy.jeju-travel.workers.dev/?url='; 
+    // CORS 프록시 설정 (Cloudflare Worker 대신 퍼블릭 프록시 사용)
+    const PROXY_URL = 'https://corsproxy.io/?url='; 
 
     function getProxiedUrl(originalUrl) {
         if (!originalUrl || originalUrl.includes('poke-ball.png')) return originalUrl;
