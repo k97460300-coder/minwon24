@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 카드 렌더링 - 16:9 다중 페이지 분할 적용
+    // 카드 렌더링 - 9:16 다중 페이지 분할 적용
     function renderCards(items) {
         itemsGrid.innerHTML = '';
         if (items.length === 0) {
@@ -69,21 +69,21 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // 3열 x 2-3행 정도가 적당하므로 한 블록당 9~12개 할당
-        const ITEMS_PER_PAGE_CARD = 12; // 3x4 layout
+        // 1열 레이아웃이므로 한 9:16 블록당 8개 정도 할당
+        const ITEMS_PER_PAGE_CARD = 8; // 1x8 layout
         for (let i = 0; i < items.length; i += ITEMS_PER_PAGE_CARD) {
             const pageItems = items.slice(i, i + ITEMS_PER_PAGE_CARD);
             
-            // 16:9 래퍼 생성
+            // 9:16 래퍼 생성
             const wrapper = document.createElement('div');
-            wrapper.className = 'table-page-169';
+            wrapper.className = 'table-page-916';
             
             // 실제 카드들이 담길 이너 그리드 생성
             const innerGrid = document.createElement('div');
             innerGrid.style.display = 'grid';
-            // CSS의 모바일 미디어 쿼리(repeat(3,1fr))를 상속받거나 하드코딩
-            innerGrid.style.gridTemplateColumns = 'repeat(3, 1fr)';
-            innerGrid.style.gap = '0.25rem';
+            // CSS의 모바일 미디어 쿼리(repeat(1,1fr))를 상속받거나 하드코딩
+            innerGrid.style.gridTemplateColumns = 'repeat(1, 1fr)';
+            innerGrid.style.gap = '0.5rem';
             
             pageItems.forEach((item, index) => {
                 const card = document.createElement('article');
@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 테이블 렌더링 (엑셀 방식) - 16:9 분할 렌더링
+    // 테이블 렌더링 (엑셀 방식) - 9:16 분할 렌더링
     function renderTable(items) {
         const pagesContainer = document.getElementById('table-pages-container');
         if (!pagesContainer) return;
@@ -113,12 +113,12 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // 스마트폰 캡처를 고려하여 16:9 비율 화면에 아기자기하게 들어갈 수 있도록 5개씩 분할
-        const ITEMS_PER_PAGE = 5; 
+        // 스마트폰 캡처를 고려하여 9:16 비율 화면에 들어갈 수 있도록 8개씩 분할
+        const ITEMS_PER_PAGE = 8; 
         for (let i = 0; i < items.length; i += ITEMS_PER_PAGE) {
             const pageItems = items.slice(i, i + ITEMS_PER_PAGE);
             const pageDiv = document.createElement('div');
-            pageDiv.className = 'table-page-169';
+            pageDiv.className = 'table-page-916';
             
             let trs = '';
             pageItems.forEach((item) => {
@@ -250,10 +250,20 @@ async function captureCard(cardId, fileName) {
     }
 }
 
-// 테이블 캡처 함수 (16:9 비율 지원)
-async function captureTable() {
-    const tableContainer = document.getElementById('table-pages-container');
-    if (!tableContainer) return;
+// 캡처 함수 (현재 표시된 뷰 9:16 비율 캡처)
+async function captureCurrentView() {
+    let targetContainer = null;
+    let titlePrefix = '';
+    
+    if (currentView === 'card') {
+        targetContainer = document.getElementById('items-grid');
+        titlePrefix = '卡片视图';
+    } else {
+        targetContainer = document.getElementById('table-pages-container');
+        titlePrefix = '表格视图';
+    }
+    
+    if (!targetContainer) return;
 
     const captureWrapper = document.createElement('div');
     captureWrapper.style.position = 'absolute';
@@ -261,30 +271,30 @@ async function captureTable() {
     captureWrapper.style.top = '0';
     captureWrapper.style.background = '#ffffff';
     captureWrapper.style.padding = '40px';
-    captureWrapper.style.width = '1280px';
+    captureWrapper.style.width = '1080px';
     
     const title = document.createElement('h2');
-    title.innerText = `拾获的遗失物品 (${new Date().toLocaleDateString()})`;
+    title.innerText = `拾获的遗失物品 - ${titlePrefix} (${new Date().toLocaleDateString()})`;
     title.style.textAlign = 'center';
     title.style.marginBottom = '30px';
     title.style.fontSize = '2rem';
     title.style.color = '#111';
     captureWrapper.appendChild(title);
 
-    const clonedPages = tableContainer.cloneNode(true);
+    const clonedPages = targetContainer.cloneNode(true);
     clonedPages.style.display = 'flex';
     clonedPages.style.flexDirection = 'column';
     clonedPages.style.gap = '20px';
     
-    // 강제 폰트 색상 적용 (캡처 화질 향상)
+    // 강제 폰트 색상 및 9:16 적용 (캡처 화질 향상)
     clonedPages.querySelectorAll('th, td').forEach(el => {
         el.style.color = 'black';
     });
     
-    // 캡처 화면에서는 모바일 화면 크기와 관계없이 강제로 16:9 고정 박스 형태 유지
-    clonedPages.querySelectorAll('.table-page-169').forEach(el => {
+    // 캡처 화면에서는 모바일 화면 크기와 관계없이 강제로 9:16 고정 박스 형태 유지
+    clonedPages.querySelectorAll('.table-page-916').forEach(el => {
         el.style.color = 'black';
-        el.style.aspectRatio = '16 / 9';
+        el.style.aspectRatio = '9 / 16';
         el.style.overflow = 'hidden';
     });
     
@@ -299,11 +309,11 @@ async function captureTable() {
             scale: 2
         });
         const link = document.createElement('a');
-        link.download = `Jeju_LostItems_Table_${new Date().toISOString().slice(0,10)}.png`;
+        link.download = `Jeju_LostItems_9-16_${new Date().toISOString().slice(0,10)}.png`;
         link.href = canvas.toDataURL('image/png');
         link.click();
     } catch (err) {
-        console.error('Table capture failed:', err);
+        console.error('Capture failed:', err);
     } finally {
         document.body.removeChild(captureWrapper);
     }

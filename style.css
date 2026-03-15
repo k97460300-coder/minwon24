@@ -352,8 +352,8 @@ header {
     backdrop-filter: blur(12px);
 }
 
-/* Table View 16:9 Format Wrapper */
-.table-page-169 {
+/* Table View 9:16 Format Wrapper */
+.table-page-916 {
     background: var(--bg-card);
     border: 2px solid var(--accent);
     border-radius: 16px;
@@ -364,8 +364,8 @@ header {
 }
 
 @media (min-width: 768px) {
-    .table-page-169 {
-        aspect-ratio: 16 / 9;
+    .table-page-916 {
+        aspect-ratio: 9 / 16;
         overflow: hidden;
     }
 }
@@ -559,8 +559,8 @@ footer {
     }
     
     .items-grid {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 0.25rem;
+        grid-template-columns: repeat(1, 1fr);
+        gap: 0.5rem;
     }
     
     .container {
@@ -568,7 +568,7 @@ footer {
     }
     
     /* Compact Table for Mobile */
-    .table-page-169 {
+    .table-page-916 {
         padding: 0.2rem;
         border-width: 1px;
     }
