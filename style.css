@@ -277,14 +277,14 @@ header {
 /* Inline Stats under Search */
 .stats-inline {
     width: 100%;
-    text-align: right;
     font-size: 0.95rem;
     color: var(--text-sub);
-    margin-top: -1rem; 
+    margin-top: 5px; 
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
     align-items: center;
     gap: 12px;
+    white-space: nowrap;
 }
 .stat-divider-inline {
     color: var(--glass-border);
@@ -350,6 +350,19 @@ header {
     border: 1px solid var(--glass-border);
     border-radius: 20px;
     backdrop-filter: blur(12px);
+}
+
+/* Table View 16:9 Format Wrapper */
+.table-page-169 {
+    aspect-ratio: 16 / 9;
+    background: var(--bg-card);
+    border: 2px solid var(--accent);
+    border-radius: 16px;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 .excel-table {

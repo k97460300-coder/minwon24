@@ -82,30 +82,57 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 테이블 렌더링 (엑셀 방식)
+    // 테이블 렌더링 (엑셀 방식) - 16:9 분할 렌더링
     function renderTable(items) {
-        tableBody.innerHTML = '';
+        const pagesContainer = document.getElementById('table-pages-container');
+        if (!pagesContainer) return;
+        pagesContainer.innerHTML = '';
+        
         if (items.length === 0) {
-            tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 2rem; color: var(--text-sub);">没有收集到数据。</td></tr>';
+            pagesContainer.innerHTML = '<div style="text-align:center; padding: 2rem; color: var(--text-sub);">没有收集到数据。</div>';
             return;
         }
 
-        items.forEach((item, index) => {
-            // Format date from YYYY-MM-DD to YY/MM/DD
-            const yy = item.date.substring(2, 4);
-            const mm = item.date.substring(5, 7);
-            const dd = item.date.substring(8, 10);
-            const shortDate = `${yy}/${mm}/${dd}`;
+        // 스마트폰 캡처를 고려하여 16:9 비율 화면에 아기자기하게 들어갈 수 있도록 6~7개씩 분할
+        const ITEMS_PER_PAGE = 7; 
+        for (let i = 0; i < items.length; i += ITEMS_PER_PAGE) {
+            const pageItems = items.slice(i, i + ITEMS_PER_PAGE);
+            const pageDiv = document.createElement('div');
+            pageDiv.className = 'table-page-169';
             
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td><img src="${item.image}" class="table-img" onclick="openImageModal('${item.image}')" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png';"></td>
-                <td style="font-weight: 600;">${item.title}</td>
-                <td>${shortDate}</td>
-                <td>${item.place || '-'}</td>
+            let trs = '';
+            pageItems.forEach((item) => {
+                const yy = item.date.substring(2, 4);
+                const mm = item.date.substring(5, 7);
+                const dd = item.date.substring(8, 10);
+                const shortDate = `${yy}/${mm}/${dd}`;
+                trs += `
+                    <tr>
+                        <td style="width: 80px;"><img src="${item.image}" class="table-img" onclick="openImageModal('${item.image}')" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png';"></td>
+                        <td style="font-weight: 600;">${item.title}</td>
+                        <td>${shortDate}</td>
+                        <td>${item.place || '-'}</td>
+                    </tr>
+                `;
+            });
+
+            pageDiv.innerHTML = `
+                <table class="excel-table">
+                    <thead>
+                        <tr>
+                            <th>图片</th>
+                            <th>物品名称</th>
+                            <th>拾获日期</th>
+                            <th>拾获地点</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${trs}
+                    </tbody>
+                </table>
             `;
-            tableBody.appendChild(tr);
-        });
+            pagesContainer.appendChild(pageDiv);
+        }
     }
 
     // 검색 기능
@@ -203,40 +230,38 @@ async function captureCard(cardId, fileName) {
     }
 }
 
-// 테이블 캡처 함수 (4:3 비율)
+// 테이블 캡처 함수 (16:9 비율 지원)
 async function captureTable() {
-    const tableWrapper = document.getElementById('items-table-wrapper');
-    if (!tableWrapper) return;
-    
-    // 4:3 비율을 위한 임시 래퍼 생성
+    const tableContainer = document.getElementById('table-pages-container');
+    if (!tableContainer) return;
+
     const captureWrapper = document.createElement('div');
+    captureWrapper.style.position = 'absolute';
+    captureWrapper.style.left = '-9999px';
+    captureWrapper.style.top = '0';
+    captureWrapper.style.background = '#ffffff';
     captureWrapper.style.padding = '40px';
-    captureWrapper.style.backgroundColor = 'white';
-    captureWrapper.style.width = '1200px'; // 고정 너비
-    captureWrapper.style.height = '900px'; // 4:3 비율 (1200 * 3/4)
-    captureWrapper.style.display = 'flex';
-    captureWrapper.style.flexDirection = 'column';
-    captureWrapper.style.position = 'fixed';
-    captureWrapper.style.top = '-9999px';
+    captureWrapper.style.width = '1280px';
     
-    const title = document.createElement('h1');
-    title.innerText = '济州特别自治道 拾获物 列表';
-    title.style.color = '#1f2937';
-    title.style.marginBottom = '20px';
+    const title = document.createElement('h2');
+    title.innerText = `拾获的遗失物品 (${new Date().toLocaleDateString()})`;
     title.style.textAlign = 'center';
+    title.style.marginBottom = '30px';
+    title.style.fontSize = '2rem';
+    title.style.color = '#111';
     captureWrapper.appendChild(title);
 
-    const cloneTable = document.getElementById('items-table').cloneNode(true);
-    cloneTable.style.backgroundColor = 'white';
-    cloneTable.style.color = 'black';
-    cloneTable.style.border = '1px solid #e5e7eb';
-    // 폰트 색상 강제 조정
-    cloneTable.querySelectorAll('th, td').forEach(el => {
+    const clonedPages = tableContainer.cloneNode(true);
+    clonedPages.style.display = 'flex';
+    clonedPages.style.flexDirection = 'column';
+    clonedPages.style.gap = '20px';
+    
+    // 강제 폰트 색상 적용 (캡처 화질 향상)
+    clonedPages.querySelectorAll('th, td, .table-page-169').forEach(el => {
         el.style.color = 'black';
-        el.style.borderColor = '#e5e7eb';
     });
-    captureWrapper.appendChild(cloneTable);
-
+    
+    captureWrapper.appendChild(clonedPages);
     document.body.appendChild(captureWrapper);
 
     try {
