@@ -273,6 +273,26 @@ header {
     color: var(--text-sub);
 }
 
+/* Inline Stats under Search */
+.stats-inline {
+    width: 100%;
+    text-align: right;
+    font-size: 0.95rem;
+    color: var(--text-sub);
+    margin-top: -1rem; 
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+}
+.stat-divider-inline {
+    color: var(--glass-border);
+}
+.stats-inline strong {
+    color: var(--text-main);
+    font-weight: 600;
+}
+
 /* Grid & Cards */
 .items-grid {
     display: grid;

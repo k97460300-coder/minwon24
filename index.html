@@ -17,17 +17,6 @@
 
     <header>
         <div class="header-content">
-            <div class="stats-glass">
-                <div class="stat-item">
-                    <span id="total-count" class="stat-value">0</span>
-                    <span class="stat-label">拾获物总数</span>
-                </div>
-                <div class="stat-divider"></div>
-                <div class="stat-item">
-                    <span id="current-date-range" class="stat-value" style="font-size: 1.2rem;">-</span>
-                    <span class="stat-label">查询日期</span>
-                </div>
-            </div>
         </div>
     </header>
 
@@ -50,6 +39,11 @@
                 <div class="search-box">
                     <input type="text" id="search-input" placeholder="搜索物品名称...">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                </div>
+                <div class="stats-inline">
+                    <span>拾获物总数: <strong id="total-count" style="color: var(--accent);">0</strong></span>
+                    <span class="stat-divider-inline">|</span>
+                    <span>查询日期: <strong id="current-date-range"></strong></span>
                 </div>
             </div>
         </div>
