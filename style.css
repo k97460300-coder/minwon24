@@ -338,23 +338,26 @@ header {
     border: none;
     color: var(--text-main);
     font-family: inherit;
-    font-size: 0.85rem;
+    font-size: 0.95rem; /* 조금 더 크게 */
     outline: none;
     cursor: pointer;
-    width: 110px; /* 고정폭으로 overflow 방지 */
+    width: 135px; /* 충분한 너비 확보 */
+    padding: 2px 0;
 }
 
 @media (max-width: 480px) {
     .date-filter-wrap {
-        padding: 4px 8px;
-        gap: 4px;
+        padding: 6px 10px;
+        gap: 6px;
+        width: 100%;
+        justify-content: center;
     }
     .date-input-ui {
-        width: 100px;
-        font-size: 0.8rem;
+        width: 125px;
+        font-size: 0.9rem;
     }
     .date-label {
-        display: none; /* 모바일 극소형 화면에선 라벨 숨김 */
+        display: none;
     }
 }
 
