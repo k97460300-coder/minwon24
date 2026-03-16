@@ -17,7 +17,10 @@
 
     <main class="container">
         <div class="filter-bar">
-            <h2>拾获的遗失物品</h2>
+            <h2 class="section-title">
+                拾获的遗失物品
+                <span class="total-badge">总数: <strong id="total-count">0</strong></span>
+            </h2>
             <div class="controls">
                 <div class="view-switcher">
                     <button id="view-card" class="btn-view active">卡片视图</button>
@@ -41,13 +44,13 @@
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                 </div>
                 <div class="stats-inline">
-                    <span>拾获物总数: <strong id="total-count" style="color: var(--accent);">0</strong></span>
-                    <span class="stat-divider-inline">|</span>
-                    <div class="date-filter-wrap" style="display: inline-flex; align-items: center; gap: 5px;">
-                        <span>查询日期:</span>
-                        <input type="date" id="start-date-input" class="date-input-ui">
-                        <span>~</span>
-                        <input type="date" id="end-date-input" class="date-input-ui">
+                    <div class="date-filter-wrap">
+                        <span class="date-label">查询日期:</span>
+                        <div class="date-inputs">
+                            <input type="date" id="start-date-input" class="date-input-ui">
+                            <span class="date-sep">~</span>
+                            <input type="date" id="end-date-input" class="date-input-ui">
+                        </div>
                     </div>
                 </div>
             </div>
