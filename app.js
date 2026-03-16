@@ -78,8 +78,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // 3열 레이아웃이므로 한 9:16 블록당 12개 할당 (3x4)
-        const ITEMS_PER_PAGE_CARD = 12; // 3x4 layout
+        // 3열 레이아웃이므로 한 9:16 블록당 15개 할당 (3x5)
+        const ITEMS_PER_PAGE_CARD = 15; // 3x5 layout
         for (let i = 0; i < items.length; i += ITEMS_PER_PAGE_CARD) {
             const pageItems = items.slice(i, i + ITEMS_PER_PAGE_CARD);
             
@@ -90,9 +90,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // 실제 카드들이 담길 이너 그리드 생성
             const innerGrid = document.createElement('div');
             innerGrid.style.display = 'grid';
-            // 3열 x 4행 하드코딩
+            // 3열 x 5행 하드코딩
             innerGrid.style.gridTemplateColumns = 'repeat(3, 1fr)';
-            innerGrid.style.gap = '0.25rem';
+            innerGrid.style.gap = '0'; // 캡처 시 빈 공간 없애기 위해 간격 제거
             
             pageItems.forEach((item, index) => {
                 const card = document.createElement('article');
@@ -305,9 +305,11 @@ async function captureCurrentView() {
         captureWrapper.appendChild(title);
 
         const clonedPage = pageDom.cloneNode(true);
-        // 강제 폰트 색상 및 스타일 적용 (캡처 화질 향상)
-        clonedPage.querySelectorAll('th, td, .card, .title').forEach(el => {
+        // 강제 폰트 색상 및 스타일 적용 (캡처 화질 향상, 빈 공간 및 테두리 제거)
+        clonedPage.querySelectorAll('th, td, .card, .title, .card-img-wrap').forEach(el => {
             el.style.color = 'black';
+            el.style.borderRadius = '0';
+            el.style.boxShadow = 'none';
         });
         
         // 캡처 화면에서는 모바일 화면 크기와 관계없이 강제로 9:16 고정 박스 형태 유지
