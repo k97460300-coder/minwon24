@@ -3,10 +3,10 @@ const path = require('path');
 const axios = require('axios');
 
 async function crawlLostItems() {
-    // 기본 날짜 설정 (최근 3일치 수집)
+    // 기본 날짜 설정 (최근 30일치 수집)
     const today = new Date();
-    const lastThreeDays = new Date();
-    lastThreeDays.setDate(today.getDate() - 3);
+    const lastMonth = new Date();
+    lastMonth.setDate(today.getDate() - 30);
     
     // API에 맞는 YYYYMMDD000000 형식
     const formatDateApi = (date, isEnd = false) => {
@@ -14,7 +14,7 @@ async function crawlLostItems() {
         return isEnd ? ymd + "235959" : ymd + "000000";
     };
 
-    const startDate = formatDateApi(lastThreeDays);
+    const startDate = formatDateApi(lastMonth);
     const endDate = formatDateApi(today);
     const simpleStartDate = startDate.slice(0, 8);
     const simpleEndDate = endDate.slice(0, 8);
@@ -60,12 +60,15 @@ async function crawlLostItems() {
     let allItems = [];
     let pageStart = 1;
 
-    // 이미지 저장 폴더 준비 (기존 폴더 초기화)
+    // 이미지 저장 폴더 준비
     const imagesDir = path.join(__dirname, '..', 'images');
-    if (fs.existsSync(imagesDir)) {
-        fs.rmSync(imagesDir, { recursive: true, force: true });
+    try {
+        if (!fs.existsSync(imagesDir)) {
+            fs.mkdirSync(imagesDir, { recursive: true });
+        }
+    } catch (e) {
+        console.warn(`[WARN] Could not create images directory: ${e.message}`);
     }
-    fs.mkdirSync(imagesDir, { recursive: true });
 
     async function downloadImage(url, destPath) {
         try {
