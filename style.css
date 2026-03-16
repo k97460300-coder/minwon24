@@ -375,6 +375,7 @@ header {
     border-collapse: collapse;
     text-align: left;
     font-size: 0.95rem;
+    table-layout: fixed; /* 고정 레이아웃으로 너비 일정하게 유지 */
 }
 
 .excel-table th {
@@ -384,6 +385,31 @@ header {
     color: var(--primary-light);
     border-bottom: 1px solid var(--glass-border);
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 각 열 너비 고정 */
+.excel-table th:nth-child(1) { width: 55px; }  /* 이미지 */
+.excel-table th:nth-child(2) { width: auto; }  /* 물품명 (가변) */
+.excel-table th:nth-child(3) { width: 100px; } /* 날짜 */
+.excel-table th:nth-child(4) { width: 120px; } /* 장소 */
+
+/* 날짜 입력창 스타일 */
+.date-input-ui {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--glass-border);
+    border-radius: 6px;
+    padding: 2px 4px;
+    color: var(--text-main);
+    font-family: inherit;
+    font-size: 0.85rem;
+    outline: none;
+    cursor: pointer;
+}
+.date-input-ui::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    opacity: 0.6;
 }
 
 .excel-table td {

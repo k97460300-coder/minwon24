@@ -43,7 +43,12 @@
                 <div class="stats-inline">
                     <span>拾获物总数: <strong id="total-count" style="color: var(--accent);">0</strong></span>
                     <span class="stat-divider-inline">|</span>
-                    <span>查询日期: <strong id="current-date-range"></strong></span>
+                    <div class="date-filter-wrap" style="display: inline-flex; align-items: center; gap: 5px;">
+                        <span>查询日期:</span>
+                        <input type="date" id="start-date-input" class="date-input-ui">
+                        <span>~</span>
+                        <input type="date" id="end-date-input" class="date-input-ui">
+                    </div>
                 </div>
             </div>
         </div>

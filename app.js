@@ -11,6 +11,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('search-input');
     const loader = document.getElementById('loader');
     const dateRangeSpan = document.getElementById('current-date-range');
+    const startDateInput = document.getElementById('start-date-input');
+    const endDateInput = document.getElementById('end-date-input');
     const filterBadge = document.getElementById('filter-info-badge');
 
     const btnCard = document.getElementById('view-card');
@@ -41,6 +43,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (dateRangeSpan) {
                 dateRangeSpan.innerText = `${filterInfo.startDate} ~ ${filterInfo.endDate}`;
             }
+
+            // 날짜 입력창 초기값 설정 (YYYYMMDD -> YYYY-MM-DD)
+            if (startDateInput && endDateInput && filterInfo.startDate !== '-') {
+                const s = filterInfo.startDate;
+                const e = filterInfo.endDate;
+                startDateInput.value = `${s.slice(0,4)}-${s.slice(4,6)}-${s.slice(6,8)}`;
+                endDateInput.value = `${e.slice(0,4)}-${e.slice(4,6)}-${e.slice(6,8)}`;
+            }
             
             renderView();
             
@@ -56,9 +66,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 뷰 렌더링 결정
-    function renderView(filteredItems = null) {
-        const items = filteredItems || allItems;
+    // 뷰 렌더링 결정 (필터링 로직 포함)
+    function renderView(customItems = null) {
+        let items = customItems || allItems;
+
+        // 날짜 필터링 적용
+        if (!customItems && startDateInput && endDateInput && startDateInput.value && endDateInput.value) {
+            const startStr = startDateInput.value.replace(/-/g, '');
+            const endStr = endDateInput.value.replace(/-/g, '');
+            
+            items = allItems.filter(item => {
+                const itemDate = item.date.replace(/-/g, '');
+                return itemDate >= startStr && itemDate <= endStr;
+            });
+        }
+
+        // 검색어 필터링 (이미 필터링된 items에 추가 적용)
+        if (searchInput && searchInput.value) {
+            const query = searchInput.value.toLowerCase();
+            items = items.filter(item => 
+                item.title.toLowerCase().includes(query) || 
+                (item.category && item.category.toLowerCase().includes(query)) ||
+                (item.place && item.place.toLowerCase().includes(query))
+            );
+        }
+
+        totalCount.innerText = items.length;
+
         if (currentView === 'card') {
             itemsGrid.style.display = 'grid';
             itemsTableWrapper.style.display = 'none';
@@ -149,10 +183,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 <table class="excel-table">
                     <thead>
                         <tr>
-                            <th style="width: 45px;">图片</th>
-                            <th>物品名称</th>
-                            <th>拾获日期</th>
-                            <th>拾获地点</th>
+                            <th style="width: 55px;">图片</th>
+                            <th style="width: auto;">物品名称</th>
+                            <th style="width: 100px;">拾获日期</th>
+                            <th style="width: 120px;">拾获地点</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -164,17 +198,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 검색 기능
+    // 검색 및 날짜 필터 이벤트
     if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase();
-            const filtered = allItems.filter(item => 
-                item.title.toLowerCase().includes(query) || 
-                (item.category && item.category.toLowerCase().includes(query)) ||
-                (item.place && item.place.toLowerCase().includes(query))
-            );
-            renderView(filtered);
-        });
+        searchInput.addEventListener('input', () => renderView());
+    }
+    if (startDateInput) {
+        startDateInput.addEventListener('change', () => renderView());
+    }
+    if (endDateInput) {
+        endDateInput.addEventListener('change', () => renderView());
     }
 
     // 뷰 전환 이벤트
@@ -217,19 +249,21 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.removeChild(link);
     });
 
-    // 크롤링 버튼 로직 (실제 크롤링은 터미널 환경 필요)
+    // 크롤링 버튼 로직
     if (btnCrawl) {
         btnCrawl.addEventListener('click', () => {
             btnCrawl.classList.add('loading');
-            btnCrawl.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg> 同步中...`;
+            btnCrawl.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg> 同步중...`;
             
-            // 실제 환경에서는 백엔드 API 호출이 필요함.
-            // 여기서는 사용자에게 가이드 제공 및 가상 딜레이
+            const startVal = startDateInput.value.replace(/-/g, '');
+            const endVal = endDateInput.value.replace(/-/g, '');
+
+            alert(`데이터 동기화 안내:\n\n1. 선택하신 기간(${startVal} ~ ${endVal}) 데이터를 새로 가져오려면 PC에서 'execution/crawl_lost_items.js' 파일의 날짜 설정을 수정한 후 크롤러를 실행해야 합니다.\n2. 현재 화면은 이미 수집된 로컬 데이터 내에서만 필터링됩니다.`);
+            
             setTimeout(() => {
-                alert('数据同步已开始。请稍후刷新页面。\n(本地环境: 需要配置 node execution/crawl_lost_items.js 在后台运行)');
                 btnCrawl.classList.remove('loading');
                 btnCrawl.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg> 同步数据`;
-            }, 1500);
+            }, 1000);
         });
     }
 
